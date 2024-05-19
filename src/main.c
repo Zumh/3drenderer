@@ -89,7 +89,6 @@ void clear_color_buffer(uint32_t color){
 			color_buffer[(WINDOW_WIDTH * y) + x] = color;
 		}
 	}
-//	color_buffer[] = color;
 
 }
 
