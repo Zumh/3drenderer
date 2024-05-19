@@ -9,8 +9,11 @@ SDL_Renderer* renderer = NULL;
 SDL_Texture* color_buffer_texture = NULL;
 uint32_t* color_buffer = NULL;
 
-const int WINDOW_WIDTH = 800;
-const int  WINDOW_HEIGHT =  600;
+//int WINDOW_WIDTH = 800;
+//int  WINDOW_HEIGHT =  600;
+int WINDOW_WIDTH = 0;
+int  WINDOW_HEIGHT =  0;
+
 
 bool initialize_window(void);
 void setup(void);
@@ -108,14 +111,21 @@ bool initialize_window(void){
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
 		fprintf(stderr, "Error initializing SDL.\n");
 	}
+	// Use SDL to query wat is the fullscreen max. width and height
+	SDL_DisplayMode display_mode;
+	SDL_GetCurrentDisplayMode(0, &display_mode);
+
+	WINDOW_WIDTH = display_mode.w;
+	WINDOW_HEIGHT = display_mode.h;
+	fprintf(stdout, "%d %d", WINDOW_WIDTH, WINDOW_HEIGHT);
 	// Create a SDL Window
 	window = SDL_CreateWindow(
 
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		800,
-		600,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT,
 		SDL_WINDOW_BORDERLESS
 	);
 
