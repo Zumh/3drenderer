@@ -9,10 +9,8 @@ SDL_Renderer* renderer = NULL;
 SDL_Texture* color_buffer_texture = NULL;
 uint32_t* color_buffer = NULL;
 
-//int WINDOW_WIDTH = 800;
-//int  WINDOW_HEIGHT =  600;
-int WINDOW_WIDTH = 0;
-int  WINDOW_HEIGHT =  0;
+int WINDOW_WIDTH = 800;
+int  WINDOW_HEIGHT =  600;
 
 
 bool initialize_window(void);
@@ -115,9 +113,10 @@ bool initialize_window(void){
 	SDL_DisplayMode display_mode;
 	SDL_GetCurrentDisplayMode(0, &display_mode);
 
+	// fake full screen intialization
 	WINDOW_WIDTH = display_mode.w;
 	WINDOW_HEIGHT = display_mode.h;
-	fprintf(stdout, "%d %d", WINDOW_WIDTH, WINDOW_HEIGHT);
+
 	// Create a SDL Window
 	window = SDL_CreateWindow(
 
@@ -139,6 +138,7 @@ bool initialize_window(void){
 		fprintf(stderr, "Error creating SDL renderer.\n");	
 		return false;
 	}
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 	return true;
 }
 
