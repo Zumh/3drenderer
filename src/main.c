@@ -23,6 +23,7 @@ void clear_color_buffer(uint32_t color);
 void destroy_window(void);
 void render_color_buffer();
 
+void draw_grid(void);
 int main(void){
 
 	printf("Hello, world!\n");
@@ -93,13 +94,35 @@ void clear_color_buffer(uint32_t color){
 
 }
 
+void draw_grid(void){
+	// grid drawing
+	/*
+	for(int y= 0; y < WINDOW_HEIGHT; y++){
+		for(int x = 0; x < WINDOW_WIDTH; x++){
+			if(x % 10 == 0 || y % 10 == 0){
+				color_buffer[(WINDOW_WIDTH * y) + x] = 0xFF333333;
+			}
+		}
+	}	
+	*/
+	// dotted grid
+	for(int y= 0; y < WINDOW_HEIGHT; y += 10){
+			for(int x = 0; x < WINDOW_WIDTH; x += 10){
+				if(x % 10 == 0 || y % 10 == 0){
+					color_buffer[(WINDOW_WIDTH * y) + x] = 0xFF333333;
+				}
+			}
+	}	
+}
 
 void render(void){
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderClear(renderer);
+	draw_grid();
 	render_color_buffer();
 	// copy this to sdl texture
-	clear_color_buffer(0xFFFFFF00);
+	//clear_color_buffer(0xFFFFFF00);
+	clear_color_buffer(0xFF000000);
 	SDL_RenderPresent(renderer);
 
 }
