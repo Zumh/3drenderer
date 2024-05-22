@@ -1,0 +1,13 @@
+Mmain	main.c	/^int main(void){$/
+calculate_color_index	display.c	/^int calculate_color_index(int x, int y, int window/
+clear_color_buffer	display.c	/^void clear_color_buffer(uint32_t color){$/
+destroy_window	display.c	/^void destroy_window(void){$/
+draw_grid	display.c	/^void draw_grid(void){$/
+draw_pixel	display.c	/^void draw_pixel(int x, int y, uint32_t color){$/
+draw_rect	display.c	/^void draw_rect(int x, int y, int width, int height/
+initialize_window	display.c	/^bool initialize_window(void){$/
+process_input	main.c	/^void process_input(void){$/
+render	main.c	/^render(void){$/
+render_color_buffer	display.c	/^void render_color_buffer(void){$/
+setup	main.c	/^void setup(void){$/
+update	main.c	/^void update(void){$/

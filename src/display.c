@@ -25,6 +25,14 @@ void destroy_window(void){
 	SDL_Quit();
 }
 
+void draw_pixel(int x, int y, uint32_t color){
+	if( x >= 0 && x < WINDOW_WIDTH && y >= 0 && y < WINDOW_HEIGHT){
+		color_buffer[calculate_color_index(x, y, WINDOW_WIDTH)] = color;
+		//	color_buffer[(WINDOW_WIDTH * y) + x] = color;
+	}	
+}
+
+
 void draw_grid(void){
 	// grid drawing
 	/*
@@ -106,7 +114,8 @@ void draw_rect(int x, int y, int width, int height, uint32_t color){
 		for(int j = 0; j < height; j++){
 			int current_x = x + i;
 			int current_y = y + j;
-			color_buffer[calculate_color_index(current_x, current_y, WINDOW_WIDTH)] = color;
+			//color_buffer[calculate_color_index(current_x, current_y, WINDOW_WIDTH)] = color;
+			draw_pixel(current_x, current_y, color);
 		}
 	}
 	

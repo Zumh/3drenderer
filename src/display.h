@@ -12,7 +12,7 @@ extern uint32_t* color_buffer;
 extern int WINDOW_WIDTH;
 extern int  WINDOW_HEIGHT;
 
-
+void draw_pixel(int x, int y, uint32_t color);
 // index calculation
 int calculate_color_index(int x, int y, int window_width);
 
