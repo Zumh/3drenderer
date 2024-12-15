@@ -7,14 +7,67 @@ SDL_Rendereer* renderer = NULL;
 bool isRunning = false;
 
 bool initialize_window(void);
+void setup(void);
+void processInput(void);
+void update(void);
+void render(void);
 
 int main(void){
 	/* TODO: Create a SDL a window */
 
 	
 	isRunning = initialize_window();
+
+	setup();
+
+	while(true){
+		process_input();
+		update();
+		render();
+		
+	}
+
 	return 0;
 }
+
+void setup(void){
+	//TODO;
+}
+
+void processInput(void){
+
+	
+	//TODO; 
+	SDL_Event event;
+	SDL_PollEven(&event);
+	
+	switch(eventtype){
+		// event of close is SDL_QUIT
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		case SDL_KEYDOWN:
+			if(event.key.keysym.sym == SDL_ESCAPE){
+				isRunning = false;
+			}
+			break;
+		default:
+		break;
+	}
+} 
+
+void update(void){
+	//TODO;
+}
+
+void render(void){
+	//TODO;
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_RenderClear(renderer);
+
+	SDL_RenderPresent(renderer);
+}
+
 
 
 bool initialize_window(void){
