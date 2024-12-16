@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 SDL_Window* window = NULL;
-SDL_Rendereer* renderer = NULL;
+SDL_Renderer* renderer = NULL;
 bool isRunning = false;
 
 bool initialize_window(void);
@@ -20,8 +20,8 @@ int main(void){
 
 	setup();
 
-	while(true){
-		process_input();
+	while(isRunning){
+		processInput();
 		update();
 		render();
 		
@@ -32,6 +32,7 @@ int main(void){
 
 void setup(void){
 	//TODO;
+	return;
 }
 
 void processInput(void){
@@ -39,15 +40,15 @@ void processInput(void){
 	
 	//TODO; 
 	SDL_Event event;
-	SDL_PollEven(&event);
+	SDL_PollEvent(&event);
 	
-	switch(eventtype){
+	switch(event.type){
 		// event of close is SDL_QUIT
 		case SDL_QUIT:
 			isRunning = false;
 			break;
 		case SDL_KEYDOWN:
-			if(event.key.keysym.sym == SDL_ESCAPE){
+			if(event.key.keysym.sym == SDLK_ESCAPE){
 				isRunning = false;
 			}
 			break;
@@ -62,7 +63,7 @@ void update(void){
 
 void render(void){
 	//TODO;
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 	SDL_RenderClear(renderer);
 
 	SDL_RenderPresent(renderer);
