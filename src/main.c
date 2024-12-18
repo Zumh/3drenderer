@@ -12,6 +12,13 @@ vec3_t cameraPosition = {
 	.y = 0,
 	.z = -5
 };
+
+vec3_t cubeRotation = {
+
+	.x = 0,
+	.y = 0,
+	.z = 0
+};
 bool isRunning = false;
 void setup(void);
 void processInput(void);
@@ -45,12 +52,26 @@ vec2_t project(vec3_t point){
 	return projectedPoint;
 }
 void update(void){
+	cubeRotation.y += 0.01;
+	cubeRotation.z += 0.01;
+	cubeRotation.x += 0.01;
 	for(int i = 0; i < POINTS; i++){
 		vec3_t point = cubePoints[i];
+		// rotate in y direction meaning lock the y axis
+		vec3_t transformedPoint = vec3RotateX(point, cubeRotation.x);
+		 transformedPoint = vec3RotateY(transformedPoint, cubeRotation.y);
+		 transformedPoint = vec3RotateZ(transformedPoint, cubeRotation.z);
+		// change the z direction 	
+		transformedPoint.z -= cameraPosition.z;		
+		// Projcet the current point
+		vec2_t projectedPoint = project(transformedPoint);
+
+		/*
 		// move a way from the camera
 		point.z -= cameraPosition.z;		
 		// Projcet the current point
 		vec2_t projectedPoint = project(point);
+		*/
 		// Save the projected 2D vector in the array of projected points
 		projectedPoints[i] = projectedPoint;		
 	}
