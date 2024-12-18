@@ -11,6 +11,5 @@ typedef struct vector3_ {
 	float y;
 	float z;
 } vec3_t;
-
 // TODO: Add functions to manupilate 2d and 3d
 #endif

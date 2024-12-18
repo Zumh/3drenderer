@@ -1,122 +1,139 @@
 #include "display.h"
-
-// Variables and global declaration
- SDL_Window* window = NULL;
- SDL_Renderer* renderer = NULL;
- SDL_Texture* color_buffer_texture = NULL;
- uint32_t* color_buffer = NULL;
- int WINDOW_WIDTH = 800;
- int  WINDOW_HEIGHT =  600;
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+// format the linear colorbuffer to profper texture
+SDL_Texture* colorBufferTexture = NULL;
 
 
-void clear_color_buffer(uint32_t color){
-	for(int y = 0; y < WINDOW_HEIGHT; y++){
-		for(int x = 0; x < WINDOW_WIDTH; x++){
-			color_buffer[calculate_color_index(x, y, WINDOW_WIDTH)] = color;
+uint32_t* colorBuffer = NULL;
+int windowWidth = 800;
+int windowHeight = 600;
+
+void drawPixel(int x, int y, uint32_t color){
+	if ( x>=0 && x < windowWidth && y >=0 && y < windowHeight){
+		colorBuffer[(windowWidth * y) + x] = color;
+	}	
+} 
+
+void drawRectangle(int windowX,int windowY,int rectWidth,int rectHeight,uint32_t color){	
+
+	for(int  rectColumn = 0; rectColumn < rectWidth; rectColumn++){
+		for(int rectRow = 0; rectRow < rectHeight; rectRow++){
+			int currentX = rectColumn + windowX;
+			int currentY = rectRow + windowY;
+			
+			//colorBuffer[(windowWidth * currentY) + currentX] = color;
+			drawPixel(currentX, currentY, color);
 		}
-	}
+	} 
 
 }
-// we de allocate in reverse order
-void destroy_window(void){
-	free(color_buffer);
+
+void drawGrid(void){
+	// Draw dots
+	for(int row = 0; row < windowHeight; row += 10){
+		for(int column = 0; column< windowWidth; column += 10){
+			// draw dots
+				
+			// draw grid 10 x 10
+			if( column % 10 == 0 || row % 10 == 0){
+				colorBuffer[(windowWidth * row) + column] = 0xFF333333;
+			}
+		}
+	}
+	// Draw grids	
+	/*for(int row = 0; row < windowHeight; row++){
+		for(int column = 0; column< windowWidth; column++){
+			// draw dots
+				
+			// draw grid 10 x 10
+			if( column % 10 == 0 || row % 10 == 0){
+				colorBuffer[(windowWidth * row) + column] = 0xFF333333;
+			}
+		}
+	}*/
+}
+
+
+void renderColorBuffer(){
+	// copy color buffer to texture
+	SDL_UpdateTexture(
+		colorBufferTexture,
+		NULL,	
+		colorBuffer,
+		(int)(windowWidth * sizeof(uint32_t))
+		
+	);
+	// want to display the entire texture
+	SDL_RenderCopy(renderer, colorBufferTexture, NULL, NULL);
+}
+void clearColorBuffer(uint32_t color){
+	for(int row = 0; row < windowHeight; row++){
+		for(int column = 0; column < windowWidth; column++){
+			colorBuffer[(windowWidth * row) + column] = color;
+		}
+	}	
+}
+
+void destroyWindow(void){
+	free(colorBuffer);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
-
-void draw_pixel(int x, int y, uint32_t color){
-	if( x >= 0 && x < WINDOW_WIDTH && y >= 0 && y < WINDOW_HEIGHT){
-		color_buffer[calculate_color_index(x, y, WINDOW_WIDTH)] = color;
-		//	color_buffer[(WINDOW_WIDTH * y) + x] = color;
-	}	
-}
+ 
 
 
-void draw_grid(void){
-	// grid drawing
-	/*
-	for(int y= 0; y < WINDOW_HEIGHT; y++){
-		for(int x = 0; x < WINDOW_WIDTH; x++){
-			if(x % 10 == 0 || y % 10 == 0){
-				color_buffer[(WINDOW_WIDTH * y) + x] = 0xFF333333;
-			}
-		}
-	}	
-	*/
-	// dotted grid
-	for(int y= 0; y < WINDOW_HEIGHT; y += 10){
-			for(int x = 0; x < WINDOW_WIDTH; x += 10){
-				if(x % 10 == 0 || y % 10 == 0){
-					color_buffer[(WINDOW_WIDTH * y) + x] = 0xFF333333;
-					color_buffer[calculate_color_index(x, y, WINDOW_WIDTH)] = 0xFF333333;
-				}
-			}
-	}	
-}
 
 
 bool initialize_window(void){
+	// mouse, keyboard
+	// test permission to access input signal from keyboard and mouse
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
 		fprintf(stderr, "Error initializing SDL.\n");
+		return false;
 	}
-	// Use SDL to query wat is the fullscreen max. width and height
-	SDL_DisplayMode display_mode;
-	SDL_GetCurrentDisplayMode(0, &display_mode);
 
-	// fake full screen intialization
-	WINDOW_WIDTH = display_mode.w;
-	WINDOW_HEIGHT = display_mode.h;
+	// WHAT IS the fullscreen max using SDL. width and height
+	// fake full screen using current window resolution
+	SDL_DisplayMode displayMode;
+	SDL_GetCurrentDisplayMode(0, &displayMode);
+	
+	windowWidth = displayMode.w;
+	windowHeight = displayMode.h;
 
-	// Create a SDL Window
+	// TODO: Create  SDL window
+	// no window border = NULL
 	window = SDL_CreateWindow(
-
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		windowWidth,
+		windowHeight,
 		SDL_WINDOW_BORDERLESS
 	);
 
+	// check if window is successfully created or not
 	if (!window){
-		fprintf(stderr, "Error creating SDL window.\n");
+		fprintf(stderr, "Error couldn't create SDL window\n");
 		return false;
 	}
-	// Create a SDL renderer
+
+	// TODO: Create a SDL renderer
+	// renderer of 'window' object
+	// -1 get a default graphics driver
+	// 0 i don't have any special flags
 	renderer = SDL_CreateRenderer(window, -1, 0);
-	if(!renderer){
-		fprintf(stderr, "Error creating SDL renderer.\n");	
+
+	if (!renderer){
+		fprintf(stderr, "Error couldn't create SDL renderer.\n");
 		return false;
 	}
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	// real window screen
+	SDL_SetWindowFullscreen(window, 
+
+	//SDL_WINDOW_FULLSCREEN
+	0
+	);	
 	return true;
-}
-
-// Renders the color buffer array in a texture and displays it
-void render_color_buffer(void){
-	SDL_UpdateTexture(
-		color_buffer_texture,
-		NULL,
-		color_buffer,
-		(int)(WINDOW_WIDTH * sizeof(uint32_t))
-	
-	);
-	SDL_RenderCopy(renderer, color_buffer_texture, NULL, NULL);
-}
-
-int calculate_color_index(int x, int y, int window_width) {
-	return (window_width * y) + x; 	
-}
-
-void draw_rect(int x, int y, int width, int height, uint32_t color){
-	for (int i = 0; i < width; i++){
-		for(int j = 0; j < height; j++){
-			int current_x = x + i;
-			int current_y = y + j;
-			//color_buffer[calculate_color_index(current_x, current_y, WINDOW_WIDTH)] = color;
-			draw_pixel(current_x, current_y, color);
-		}
-	}
-	
 }

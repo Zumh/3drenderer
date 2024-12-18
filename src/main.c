@@ -1,31 +1,22 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <SDL2/SDL.h>
+#include "display.h"
+#include "vector.h"
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-// format the linear colorbuffer to profper texture
-SDL_Texture* colorBufferTexture = NULL;
+// Declare an array of vectors 
 
-
-uint32_t* colorBuffer = NULL;
-int windowWidth = 800;
-int windowHeight = 600;
+const int fovFactor  = 700;
+const int POINTS = 9 * 9 * 9;
+vec3_t cubePoints[POINTS]; //9^3 cube
+vec2_t projectedPoints[POINTS];
+vec3_t cameraPosition = {
+	.x = 0,
+	.y = 0,
+	.z = -5
+};
 bool isRunning = false;
-const int GRIDSIZE = 20;
-
-
-bool initialize_window(void);
 void setup(void);
 void processInput(void);
 void update(void);
-void renderColorBuffer();
 void render(void);
-void destroyWindow(void);
-void clearColorBuffer(uint32_t color);
-void drawGrid(void);
-void drawRectangle(int windowX,int windowY,int rectWidth,int rectHeight,uint32_t color);	
 int main(void){
 	/* TODO: Create a SDL a window */
 
@@ -33,7 +24,7 @@ int main(void){
 	isRunning = initialize_window();
 
 	setup();
-
+	//vec3_t myvector = {2.0, 3.0, -4.0};
 	while(isRunning){
 		processInput();
 		update();
@@ -44,64 +35,43 @@ int main(void){
 	return 0;
 }
 
-void drawRectangle(int windowX,int windowY,int rectWidth,int rectHeight,uint32_t color){	
-	for(int  rectColumn = 0; rectColumn < rectWidth; rectColumn++){
-		for(int rectRow = 0; rectRow < rectHeight; rectRow++){
-			int currentX = rectColumn + windowX;
-			int currentY = rectRow + windowY;
-			colorBuffer[(windowWidth * currentY) + currentX] = color;
-		}
-	} 
+// function that recives a 3D vector and returns a projected 2D point
+vec2_t project(vec3_t point){
+	vec2_t projectedPoint = {
+		.x = (fovFactor * point.x)/ point.z,
+		.y = (fovFactor * point.y)/ point.z
+	};
 
+	return projectedPoint;
 }
-
-void drawGrid(void){
-	// Draw dots
-	for(int row = 0; row < windowHeight; row += 10){
-		for(int column = 0; column< windowWidth; column += 10){
-			// draw dots
-				
-			// draw grid 10 x 10
-			if( column % 10 == 0 || row % 10 == 0){
-				colorBuffer[(windowWidth * row) + column] = 0xFF333333;
-			}
-		}
-	}
-	// Draw grids	
-	/*for(int row = 0; row < windowHeight; row++){
-		for(int column = 0; column< windowWidth; column++){
-			// draw dots
-				
-			// draw grid 10 x 10
-			if( column % 10 == 0 || row % 10 == 0){
-				colorBuffer[(windowWidth * row) + column] = 0xFF333333;
-			}
-		}
-	}*/
-}
-
-
 void update(void){
-	//TODO;
+	for(int i = 0; i < POINTS; i++){
+		vec3_t point = cubePoints[i];
+		// move a way from the camera
+		point.z -= cameraPosition.z;		
+		// Projcet the current point
+		vec2_t projectedPoint = project(point);
+		// Save the projected 2D vector in the array of projected points
+		projectedPoints[i] = projectedPoint;		
+	}
 }
-void renderColorBuffer(){
-	// copy color buffer to texture
-	SDL_UpdateTexture(
-		colorBufferTexture,
-		NULL,	
-		colorBuffer,
-		(int)(windowWidth * sizeof(uint32_t))
-		
-	);
-	// want to display the entire texture
-	SDL_RenderCopy(renderer, colorBufferTexture, NULL, NULL);
-}
+
 void render(void){
 	//TODO;
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	SDL_RenderClear(renderer);
+	//SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	//SDL_RenderClear(renderer);
 	drawGrid();
-	drawRectangle(300, 200, 300, 150, 0xFFFF80);
+	//drawPixel(20,20, 0xFF00FF);
+	//drawRectangle(300, 200, 300, 150, 0xFFFF80);
+		
+	for ( int i = 0; i < POINTS; i++){
+		vec2_t projectedPoint = projectedPoints[i];
+		drawRectangle(
+			projectedPoint.x + (windowWidth / 2),
+			projectedPoint.y + (windowHeight /2),
+			4,4,0xFF00FF
+		);
+	}
 	renderColorBuffer();
 	// clear the color before rendering them
 	// rgb
@@ -111,20 +81,9 @@ void render(void){
 	SDL_RenderPresent(renderer);
 }
 
-void clearColorBuffer(uint32_t color){
-	for(int row = 0; row < windowHeight; row++){
-		for(int column = 0; column < windowWidth; column++){
-			colorBuffer[(windowWidth * row) + column] = color;
-		}
-	}	
-}
 
-void destroyWindow(void){
-	free(colorBuffer);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-}
+
+
 void setup(void){
 	// allocating the size of a grid using windowWidth and windowHeight
 	colorBuffer = (uint32_t*) malloc(sizeof(uint32_t) * windowWidth * windowHeight);
@@ -136,6 +95,17 @@ void setup(void){
 		windowWidth,
 		windowHeight
 	);
+	// start loading my array of vectors
+	int pointCount = 0;	
+	for ( float x = -1.0; x <= 1.0;  x += 0.25){
+		
+		for ( float y = -1.0; y <= 1.0;  y += 0.25){
+			for ( float z= -1.0; z <= 1.0;  z += 0.25){
+				vec3_t newPoint = {.x = x, .y = y, .z = z};
+				cubePoints[pointCount++] = newPoint;
+			}
+		}
+	}
 }
 
 void processInput(void){
@@ -163,50 +133,4 @@ void processInput(void){
 
 
 
-bool initialize_window(void){
-	// mouse, keyboard
-	// test permission to access input signal from keyboard and mouse
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
-		fprintf(stderr, "Error initializing SDL.\n");
-		return false;
-	}
 
-	// WHAT IS the fullscreen max using SDL. width and height
-	// fake full screen using current window resolution
-	SDL_DisplayMode displayMode;
-	SDL_GetCurrentDisplayMode(0, &displayMode);
-	
-	windowWidth = displayMode.w;
-	windowHeight = displayMode.h;
-
-	// TODO: Create  SDL window
-	// no window border = NULL
-	window = SDL_CreateWindow(
-		NULL,
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		windowWidth,
-		windowHeight,
-		SDL_WINDOW_BORDERLESS
-	);
-
-	// check if window is successfully created or not
-	if (!window){
-		fprintf(stderr, "Error couldn't create SDL window\n");
-		return false;
-	}
-
-	// TODO: Create a SDL renderer
-	// renderer of 'window' object
-	// -1 get a default graphics driver
-	// 0 i don't have any special flags
-	renderer = SDL_CreateRenderer(window, -1, 0);
-
-	if (!renderer){
-		fprintf(stderr, "Error couldn't create SDL renderer.\n");
-		return false;
-	}
-	// real window screen
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);	
-	return true;
-}
