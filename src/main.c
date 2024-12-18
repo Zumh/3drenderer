@@ -20,6 +20,8 @@ vec3_t cubeRotation = {
 	.z = 0
 };
 bool isRunning = false;
+int previousFrameTime = 0;
+
 void setup(void);
 void processInput(void);
 void update(void);
@@ -52,6 +54,21 @@ vec2_t project(vec3_t point){
 	return projectedPoint;
 }
 void update(void){
+	// manual delay, relying on process speed
+	/*
+	while(!SDL_TICKS_PASSED(SDL_GetTicks(), previousFrameTime + FRAME_TARGET_TIME));
+	previousFrameTime = SDL_GetTicks();
+	*/
+	// os delay 
+	// calculate reamining time to wait
+	int remainingTimeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
+	// if the reamining time to wait is within target time frame then do the waiting using os delay 
+	// os delay does context switching
+	if (remainingTimeToWait > 0 && remainingTimeToWait <= FRAME_TARGET_TIME){
+		SDL_Delay(remainingTimeToWait);
+	}	
+	previousFrameTime = SDL_GetTicks();
+	
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
 	cubeRotation.x += 0.01;
