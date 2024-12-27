@@ -4,9 +4,6 @@
 // Declare an array of vectors 
 
 const int fovFactor  = 700;
-const int POINTS = 9 * 9 * 9;
-vec3_t cubePoints[POINTS]; //9^3 cube
-vec2_t projectedPoints[POINTS];
 vec3_t cameraPosition = {
 	.x = 0,
 	.y = 0,
@@ -72,6 +69,7 @@ void update(void){
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
 	cubeRotation.x += 0.01;
+	/*
 	for(int i = 0; i < POINTS; i++){
 		vec3_t point = cubePoints[i];
 		// rotate in y direction meaning lock the y axis
@@ -92,6 +90,7 @@ void update(void){
 		// Save the projected 2D vector in the array of projected points
 		projectedPoints[i] = projectedPoint;		
 	}
+	*/
 }
 
 void render(void){
@@ -102,6 +101,7 @@ void render(void){
 	//drawPixel(20,20, 0xFF00FF);
 	//drawRectangle(300, 200, 300, 150, 0xFFFF80);
 		
+	/*
 	for ( int i = 0; i < POINTS; i++){
 		vec2_t projectedPoint = projectedPoints[i];
 		drawRectangle(
@@ -110,6 +110,7 @@ void render(void){
 			4,4,0xFF00FF
 		);
 	}
+	*/
 	renderColorBuffer();
 	// clear the color before rendering them
 	// rgb
@@ -117,6 +118,7 @@ void render(void){
 	// black background
 	clearColorBuffer(0xFF000000);
 	SDL_RenderPresent(renderer);
+	
 }
 
 
@@ -133,17 +135,6 @@ void setup(void){
 		windowWidth,
 		windowHeight
 	);
-	// start loading my array of vectors
-	int pointCount = 0;	
-	for ( float x = -1.0; x <= 1.0;  x += 0.25){
-		
-		for ( float y = -1.0; y <= 1.0;  y += 0.25){
-			for ( float z= -1.0; z <= 1.0;  z += 0.25){
-				vec3_t newPoint = {.x = x, .y = y, .z = z};
-				cubePoints[pointCount++] = newPoint;
-			}
-		}
-	}
 }
 
 void processInput(void){
