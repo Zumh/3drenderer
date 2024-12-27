@@ -1,5 +1,13 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <SDL2/SDL.h>
+
 #include "display.h"
 #include "vector.h"
+#include "mesh.h"
+
+triangle_t triangles_to_render[N_MESH_FACES];
 
 // Declare an array of vectors 
 
@@ -52,11 +60,6 @@ vec2_t project(vec3_t point){
 }
 void update(void){
 	// manual delay, relying on process speed
-	/*
-	while(!SDL_TICKS_PASSED(SDL_GetTicks(), previousFrameTime + FRAME_TARGET_TIME));
-	previousFrameTime = SDL_GetTicks();
-	*/
-	// os delay 
 	// calculate reamining time to wait
 	int remainingTimeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
 	// if the reamining time to wait is within target time frame then do the waiting using os delay 
@@ -69,48 +72,74 @@ void update(void){
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
 	cubeRotation.x += 0.01;
-	/*
-	for(int i = 0; i < POINTS; i++){
-		vec3_t point = cubePoints[i];
-		// rotate in y direction meaning lock the y axis
-		vec3_t transformedPoint = vec3RotateX(point, cubeRotation.x);
-		 transformedPoint = vec3RotateY(transformedPoint, cubeRotation.y);
-		 transformedPoint = vec3RotateZ(transformedPoint, cubeRotation.z);
-		// change the z direction 	
-		transformedPoint.z -= cameraPosition.z;		
-		// Projcet the current point
-		vec2_t projectedPoint = project(transformedPoint);
+	
+	// Loop all triangle faces of our mesh
+	for(int i = 0; i < N_MESH_FACES; i++){
+		face_t mesh_face = mesh_faces[i];
+		
+		vec3_t face_vertices[3];
+		face_vertices[0] = mesh_vertices[mesh_face.a - 1];
+		face_vertices[1] = mesh_vertices[mesh_face.b - 1];
+		face_vertices[2] = mesh_vertices[mesh_face.c - 1];
+		
+		triangle_t projected_triangle;
+	
+		// Loop all three vertices of this current face and apply tranformations
+		
+		for(int j = 0; j < 3; j++){
+			vec3_t transformed_vertex = face_vertices[j];
+			transformed_vertex = vec3RotateX(transformed_vertex, cubeRotation.x);
+			transformed_vertex = vec3RotateY(transformed_vertex, cubeRotation.y);
+			transformed_vertex = vec3RotateZ(transformed_vertex, cubeRotation.z);
+			
+			// Translate the vertex away from the camera
+			transformed_vertex.z -= cameraPosition.z;
 
-		/*
-		// move a way from the camera
-		point.z -= cameraPosition.z;		
-		// Projcet the current point
-		vec2_t projectedPoint = project(point);
-		*/
-		// Save the projected 2D vector in the array of projected points
-		projectedPoints[i] = projectedPoint;		
+			// Project the current vertex
+			vec2_t projected_point = project(transformed_vertex);
+			// Sacle and translate the projected points to the middle of the screen
+			projected_point.x += (windowWidth/2);
+			projected_point.y += (windowHeight/2);
+
+			projected_triangle.points[j] = projected_point;
+		
+		}
+		
+		// Save the projected triangle in the array of triangles to render
+		triangles_to_render[i] = projected_triangle;
 	}
-	*/
+
+
 }
 
 void render(void){
-	//TODO;
-	//SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	//SDL_RenderClear(renderer);
 	drawGrid();
-	//drawPixel(20,20, 0xFF00FF);
-	//drawRectangle(300, 200, 300, 150, 0xFFFF80);
 		
-	/*
-	for ( int i = 0; i < POINTS; i++){
-		vec2_t projectedPoint = projectedPoints[i];
+	for ( int i = 0; i < N_MESH_FACES; i++){
+		triangle_t triangle = triangles_to_render[i];
 		drawRectangle(
-			projectedPoint.x + (windowWidth / 2),
-			projectedPoint.y + (windowHeight /2),
-			4,4,0xFF00FF
+			triangle.points[0].x,
+			triangle.points[0].y,
+			3,3,
+			0xFFFFFF00
 		);
+		drawRectangle(
+			triangle.points[1].x,
+			triangle.points[1].y,
+			3,3,
+			0xFFFFFF00
+		);
+		drawRectangle(
+			triangle.points[2].x,
+			triangle.points[2].y,
+			3,3,
+			0xFFFFFF00
+		);
+
+
 	}
-	*/
+	
+	
 	renderColorBuffer();
 	// clear the color before rendering them
 	// rgb
