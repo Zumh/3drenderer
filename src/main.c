@@ -10,7 +10,6 @@
 triangle_t triangles_to_render[N_MESH_FACES];
 
 // Declare an array of vectors 
-
 const int fovFactor  = 700;
 vec3_t cameraPosition = {
 	.x = 0,
@@ -114,7 +113,7 @@ void update(void){
 
 void render(void){
 	drawGrid();
-		
+	/*		
 	for ( int i = 0; i < N_MESH_FACES; i++){
 		triangle_t triangle = triangles_to_render[i];
 		drawRectangle(
@@ -138,12 +137,31 @@ void render(void){
 
 
 	}
-	
+	*/	
+
+	for(int i = 0; i < N_MESH_FACES; i++){
+		triangle_t triangle = triangles_to_render[i];
+		
+		// Draw vertex points
+		drawRectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
+		drawRectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
+		drawRectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
+
+		// Draw unfilled triangle
+		draw_triangle(
+			triangle.points[0].x,
+			triangle.points[0].y,
+			triangle.points[1].x,
+			triangle.points[1].y,
+			triangle.points[2].x,
+			triangle.points[2].y,
+			0xFF00FF00
+		);
+	}	
 	
 	renderColorBuffer();
 	// clear the color before rendering them
 	// rgb
-	//clearColorBuffer(0xFF0000FF);
 	// black background
 	clearColorBuffer(0xFF000000);
 	SDL_RenderPresent(renderer);
