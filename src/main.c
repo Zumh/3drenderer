@@ -184,7 +184,7 @@ void setup(void){
 
 	// Loads the cube value in the mesh data structure
 	//	load_cube_mesh_data();
-	load_obj_file_data("./assets/space_ship.obj");
+	load_obj_file_data("./assets/cube.obj");
 }
 
 void processInput(void){
