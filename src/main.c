@@ -20,12 +20,12 @@ vec3_t cameraPosition = {
 	.z = -5
 };
 
-vec3_t cubeRotation = {
+/*vec3_t cubeRotation = {
 
 	.x = 0,
 	.y = 0,
 	.z = 0
-};
+};*/
 bool isRunning = false;
 int previousFrameTime = 0;
 
@@ -33,6 +33,7 @@ void setup(void);
 void processInput(void);
 void update(void);
 void render(void);
+void free_resources(void);
 int main(void){
 	/* TODO: Create a SDL a window */
 
@@ -48,8 +49,17 @@ int main(void){
 		
 	}
 	destroyWindow();
+	free_resources();
 	return 0;
 }
+
+// free the memory that was dynamically allocated by the program
+void free_resources(void){
+	free(colorBuffer);
+	array_free(mesh.faces);
+	array_free(mesh.vertices);	
+}
+
 
 // function that recives a 3D vector and returns a projected 2D point
 vec2_t project(vec3_t point){
@@ -74,18 +84,20 @@ void update(void){
 	// initialize the array of triangles to render
 	triangles_to_render = NULL;	
 	
-	cubeRotation.y += 0.01;
-	cubeRotation.z += 0.01;
-	cubeRotation.x += 0.01;
+	mesh.rotation.y += 0.01;
+	mesh.rotation.z += 0.01;
+	mesh.rotation.x += 0.01;
 	
 	// Loop all triangle faces of our mesh
-	for(int i = 0; i < N_MESH_FACES; i++){
-		face_t mesh_face = mesh_faces[i];
+	int num_faces = array_length(mesh.faces);
+
+	for(int i = 0; i < num_faces; i++){
+		face_t mesh_face = mesh.faces[i];
 		
 		vec3_t face_vertices[3];
-		face_vertices[0] = mesh_vertices[mesh_face.a - 1];
-		face_vertices[1] = mesh_vertices[mesh_face.b - 1];
-		face_vertices[2] = mesh_vertices[mesh_face.c - 1];
+		face_vertices[0] = mesh.vertices[mesh_face.a - 1];
+		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
+		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 		
 		triangle_t projected_triangle;
 	
@@ -93,9 +105,9 @@ void update(void){
 		
 		for(int j = 0; j < 3; j++){
 			vec3_t transformed_vertex = face_vertices[j];
-			transformed_vertex = vec3RotateX(transformed_vertex, cubeRotation.x);
-			transformed_vertex = vec3RotateY(transformed_vertex, cubeRotation.y);
-			transformed_vertex = vec3RotateZ(transformed_vertex, cubeRotation.z);
+			transformed_vertex = vec3RotateX(transformed_vertex, mesh.rotation.x);
+			transformed_vertex = vec3RotateY(transformed_vertex, mesh.rotation.y);
+			transformed_vertex = vec3RotateZ(transformed_vertex, mesh.rotation.z);
 			
 			// Translate the vertex away from the camera
 			transformed_vertex.z -= cameraPosition.z;
@@ -173,6 +185,9 @@ void setup(void){
 		windowWidth,
 		windowHeight
 	);
+
+	// Loads the cube value in the mesh data structure
+	load_cube_mesh_data();
 }
 
 void processInput(void){
