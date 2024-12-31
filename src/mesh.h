@@ -1,6 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
-
+#include <string.h>
 #include "vector.h"
 #include "triangle.h"
 
@@ -24,4 +24,5 @@ extern mesh_t mesh;
 
 
 void load_cube_mesh_data(void);
+void load_obj_file_data(const char* filename) ;
 #endif

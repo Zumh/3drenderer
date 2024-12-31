@@ -36,13 +36,14 @@ int main(void){
 	isRunning = initialize_window();
 
 	setup();
-	//vec3_t myvector = {2.0, 3.0, -4.0};
+
 	while(isRunning){
 		processInput();
 		update();
 		render();
 		
 	}
+
 	destroyWindow();
 	free_resources();
 	return 0;
@@ -182,7 +183,8 @@ void setup(void){
 	);
 
 	// Loads the cube value in the mesh data structure
-	load_cube_mesh_data();
+	//	load_cube_mesh_data();
+	load_obj_file_data("./assets/space_ship.obj");
 }
 
 void processInput(void){
