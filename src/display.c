@@ -10,6 +10,8 @@ int windowWidth = 800;
 int windowHeight = 600;
 
 // drawing a line in rastering
+// DDA algorithm
+/*
 void draw_line(int x0, int y0, int x1, int y1, uint32_t color){
 	int delta_x = (x1 - x0);
 	int delta_y = (y1 - y0);
@@ -29,6 +31,87 @@ void draw_line(int x0, int y0, int x1, int y1, uint32_t color){
 	}
 
 
+}*/
+
+// using Bresenhame's Algorithm
+// https://www.youtube.com/watch?v=CceepU1vIKo
+void draw_line(int x0, int y0, int x1, int y1, uint32_t color){
+	int x_delta = abs(x1 - x0);
+	int y_delta = abs(y1 - y0);
+	
+	if (x_delta > y_delta) {
+		draw_horizontal_line(x0, y0, x1, y1, color);			
+	} else {
+
+		draw_vertical_line(x0, y0, x1, y1, color);			
+	}
+}
+
+void draw_vertical_line(int x0, int y0, int x1, int y1, uint32_t color){
+	if (y0 > y1){
+		int temp = x0;
+		x0 = x1;
+		x1 = temp;
+				
+		temp = y0;
+		y0 = y1;
+		y1 = temp;	
+	}
+
+	int x_delta = x1 - x0;
+	int y_delta = y1 - y0;
+	
+	int direction = (x_delta < 0) ? -1 : 1;
+	x_delta *= direction;
+	
+	if (y_delta != 0){
+		int current_x = x0;
+		int p = 2 * x_delta - y_delta;
+		
+		for (int i = 0; i < y_delta + 1; i++){
+			drawPixel(current_x, y0 + i, color);
+			if (p >= 0){
+				current_x += direction;
+				p -= 2 * y_delta;
+			} 
+			p += (2 * x_delta);
+		}
+	}	
+	
+}
+
+
+void draw_horizontal_line(int x0, int y0, int x1, int y1, uint32_t color){
+	if (x0 > x1){
+		int temp = x0;
+		x0 = x1;
+		x1 = temp;
+			
+		temp = y0;
+		y0 = y1;
+		y1 = temp;	
+	}
+
+	int x_delta = x1 - x0;
+	int y_delta = y1 - y0;
+	
+	int direction = (y_delta < 0) ? -1 : 1;
+	y_delta *= direction;
+	
+	if (x_delta != 0){
+		int current_y = y0;
+		int p = 2 * y_delta - x_delta;
+		
+		for (int i = 0; i < x_delta + 1; i++){
+			drawPixel(x0 + i, current_y, color);
+			if (p >= 0){
+				current_y += direction;
+				p -= 2 * x_delta;
+			} 
+			p += (2 * y_delta);
+		}
+	}	
+	
 }
 
 void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color){

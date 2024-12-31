@@ -3,11 +3,14 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+#include "array.h"
 #include "display.h"
 #include "vector.h"
 #include "mesh.h"
 
-triangle_t triangles_to_render[N_MESH_FACES];
+// Array of triangles should be rendered frame by frame
+// allocating dynamic memory inside a game loop is bad idea because it slow things down
+triangle_t* triangles_to_render = NULL;
 
 // Declare an array of vectors 
 const int fovFactor  = 700;
@@ -67,6 +70,9 @@ void update(void){
 		SDL_Delay(remainingTimeToWait);
 	}	
 	previousFrameTime = SDL_GetTicks();
+
+	// initialize the array of triangles to render
+	triangles_to_render = NULL;	
 	
 	cubeRotation.y += 0.01;
 	cubeRotation.z += 0.01;
@@ -105,41 +111,23 @@ void update(void){
 		}
 		
 		// Save the projected triangle in the array of triangles to render
-		triangles_to_render[i] = projected_triangle;
+		//triangles_to_render[i] = projected_triangle;
+		array_push(triangles_to_render, projected_triangle);
 	}
 
 
 }
 
+
 void render(void){
 	drawGrid();
-	/*		
-	for ( int i = 0; i < N_MESH_FACES; i++){
-		triangle_t triangle = triangles_to_render[i];
-		drawRectangle(
-			triangle.points[0].x,
-			triangle.points[0].y,
-			3,3,
-			0xFFFFFF00
-		);
-		drawRectangle(
-			triangle.points[1].x,
-			triangle.points[1].y,
-			3,3,
-			0xFFFFFF00
-		);
-		drawRectangle(
-			triangle.points[2].x,
-			triangle.points[2].y,
-			3,3,
-			0xFFFFFF00
-		);
+	
 
+	// Loop all projected triangles and render then
 
-	}
-	*/	
+	int num_triangles = array_length(triangles_to_render);
 
-	for(int i = 0; i < N_MESH_FACES; i++){
+	for(int i = 0; i < num_triangles; i++){
 		triangle_t triangle = triangles_to_render[i];
 		
 		// Draw vertex points
@@ -158,6 +146,9 @@ void render(void){
 			0xFF00FF00
 		);
 	}	
+		
+	// Clear the array of triangles to render every frame loop
+	array_free(triangles_to_render);
 	
 	renderColorBuffer();
 	// clear the color before rendering them
