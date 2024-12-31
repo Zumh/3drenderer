@@ -20,12 +20,7 @@ vec3_t cameraPosition = {
 	.z = -5
 };
 
-/*vec3_t cubeRotation = {
 
-	.x = 0,
-	.y = 0,
-	.z = 0
-};*/
 bool isRunning = false;
 int previousFrameTime = 0;
 
@@ -35,7 +30,7 @@ void update(void);
 void render(void);
 void free_resources(void);
 int main(void){
-	/* TODO: Create a SDL a window */
+	/* Create a SDL a window */
 
 	
 	isRunning = initialize_window();
@@ -193,7 +188,6 @@ void setup(void){
 void processInput(void){
 
 	
-	//TODO; 
 	SDL_Event event;
 	SDL_PollEvent(&event);
 	
